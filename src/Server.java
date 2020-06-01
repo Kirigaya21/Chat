@@ -10,15 +10,13 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    // All client names, so we can check for duplicates upon registration.
     private static Set<String> names = new HashSet<>();
 
-    // The set of all the print writers for all the clients, used for broadcast.
     private static Set<PrintWriter> writers = new HashSet<>();
 
     public static void main(String[] args) throws Exception {
         System.out.println("The chat server is running...");
-        var pool = Executors.newFixedThreadPool(10);        // max no of people allowed to chat
+        var pool = Executors.newFixedThreadPool(10);
         try (var listener = new ServerSocket(25000)) {
             while (true) {
                 pool.execute(new Handler(listener.accept()));
@@ -26,30 +24,16 @@ public class Server {
         }
     }
 
-    /**
-     * The client handler task.
-     */
     private static class Handler implements Runnable {
         private String name;
         private Socket socket;
         private Scanner in;
         private PrintWriter out;
 
-        /**
-         * Constructs a handler thread, squirreling away the socket. All the interesting
-         * work is done in the run method. Remember the constructor is called from the
-         * server's main method, so this has to be as short as possible.
-         */
         public Handler(Socket socket) {
             this.socket = socket;
         }
 
-        /**
-         * Services this thread's client by repeatedly requesting a screen name until a
-         * unique one has been submitted, then acknowledges the name and registers the
-         * output stream for the client in a global set, then repeatedly gets inputs and
-         * broadcasts them.
-         */
         public void run() {
             try {
                 in = new Scanner(socket.getInputStream());
@@ -70,9 +54,6 @@ public class Server {
                     }
                 }
 
-                // Now that a successful name has been chosen, add the socket's print writer
-                // to the set of all writers so this client can receive broadcast messages.
-                // But BEFORE THAT, let everyone else know that the new person has joined!
                 out.println("NAMEACCEPTED " + name);
                 for (PrintWriter writer : writers) {
                     System.out.println(name + " joined. ");

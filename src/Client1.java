@@ -4,8 +4,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 
-// Java code for thread creation by extending
-// the Thread class
+
 class doRecieve1 extends Thread
 {   Socket socket;
     Scanner in;
